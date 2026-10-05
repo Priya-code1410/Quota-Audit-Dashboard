@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quota Audit Operations & Aging Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen pb-12">
+
+  <!-- Header -->
+  <header class="bg-indigo-900 text-white py-6 shadow-md border-b border-indigo-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div>
+        <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-800 text-indigo-200 mb-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          Live Audit Dashboard
+        </div>
+        <h1 class="text-2xl font-bold tracking-tight">Quota Audit Operations & Aging Tracker</h1>
+        <p class="text-indigo-200 text-sm">Team workload breakdown, aging analysis, and pending quota status</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="copySlackUpdate()" class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-4 py-2.5 rounded-lg shadow-sm text-sm transition">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 15a3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3h3v3zm1.5 0a1.5 1.5 0 0 0 1.5 1.5 1.5 1.5 0 0 0 1.5-1.5V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v9zm3-7.5A3 3 0 0 1 13.5 4.5 3 3 0 0 1 16.5 7.5a3 3 0 0 1-3 3h-3v-3zm1.5 0a1.5 1.5 0 0 0 1.5 1.5 1.5 1.5 0 0 0 1.5-1.5 1.5 1.5 0 0 0-1.5-1.5h-1.5v1.5zm7.5 3a3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3h-3v-3zm-1.5 0a1.5 1.5 0 0 0-1.5-1.5 1.5 1.5 0 0 0-1.5 1.5v9a3 3 0 0 0 3 3 3 3 0 0 0 3-3v-9zm-3 7.5a3 3 0 0 1-3.5 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3h3v3zm-1.5 0a1.5 1.5 0 0 0-1.5-1.5 1.5 1.5 0 0 0-1.5 1.5 1.5 1.5 0 0 0 1.5 1.5h1.5v-1.5z"/></svg>
+          Copy Share Summary
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-8">
+
+    <!-- TWO-ROW BANNER LAYOUT -->
+    <div class="space-y-4">
+      
+      <!-- Top Row: Pending Quota Plans -->
+      <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-xl p-6 text-white shadow-lg border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-lg bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-400 shrink-0">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
+          <div>
+            <span class="text-xs font-semibold text-indigo-300 uppercase tracking-wider">Primary Metric</span>
+            <h2 class="text-xl font-bold text-white">Pending Quota Plans</h2>
+            <p class="text-slate-400 text-xs mt-0.5">Total unverified/pending quota items currently active</p>
+          </div>
+        </div>
+        <div class="text-left md:text-right">
+          <div class="text-4xl font-extrabold text-white tracking-tight">1,613</div>
+          <span class="text-xs text-indigo-300 font-medium">Across 9 Team Members</span>
+        </div>
+      </div>
+
+      <!-- Second Row: All 4 Aging Categories Horizontally Side-by-Side -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- 31-60 Days -->
+        <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex items-center justify-between hover:border-indigo-300 transition">
+          <div>
+            <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Plan Age</span>
+            <h3 class="text-sm font-bold text-slate-800 mt-1">31 – 60 Days</h3>
+            <span class="inline-block mt-2 text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded font-medium">Moderate</span>
+          </div>
+          <div class="text-right">
+            <span class="text-3xl font-extrabold text-slate-800">303</span>
+            <div class="text-[10px] text-slate-400 mt-0.5">18.8% of Total</div>
+          </div>
+        </div>
+
+        <!-- 60-89 Days -->
+        <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex items-center justify-between hover:border-indigo-300 transition">
+          <div>
+            <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Plan Age</span>
+            <h3 class="text-sm font-bold text-slate-800 mt-1">60 – 89 Days</h3>
+            <span class="inline-block mt-2 text-xs text-amber-700 bg-amber-50 px-2 py-0.5 rounded font-medium">Needs Attention</span>
+          </div>
+          <div class="text-right">
+            <span class="text-3xl font-extrabold text-amber-600">263</span>
+            <div class="text-[10px] text-slate-400 mt-0.5">16.3% of Total</div>
+          </div>
+        </div>
+
+        <!-- 90-120 Days -->
+        <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex items-center justify-between hover:border-indigo-300 transition">
+          <div>
+            <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Plan Age</span>
+            <h3 class="text-sm font-bold text-slate-800 mt-1">90 – 120 Days</h3>
+            <span class="inline-block mt-2 text-xs text-orange-700 bg-orange-50 px-2 py-0.5 rounded font-medium">High Aging</span>
+          </div>
+          <div class="text-right">
+            <span class="text-3xl font-extrabold text-orange-600">61</span>
+            <div class="text-[10px] text-slate-400 mt-0.5">3.8% of Total</div>
+          </div>
+        </div>
+
+        <!-- > 120 Days -->
+        <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex items-center justify-between hover:border-red-300 transition">
+          <div>
+            <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Plan Age</span>
+            <h3 class="text-sm font-bold text-slate-800 mt-1">&gt; 120 Days</h3>
+            <span class="inline-block mt-2 text-xs text-red-700 bg-red-50 px-2 py-0.5 rounded font-medium">Critical</span>
+          </div>
+          <div class="text-right">
+            <span class="text-3xl font-extrabold text-red-600">165</span>
+            <div class="text-[10px] text-slate-400 mt-0.5">10.2% of Total</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Interactive Individual Spotlight -->
+    <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <span>👤</span> Individual Member Spotlight
+          </h2>
+          <p class="text-slate-500 text-sm">Select a team member to focus on their assigned quota workload and aging items.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <label for="memberSelect" class="text-xs font-bold text-slate-600 uppercase">Select Member:</label>
+          <select id="memberSelect" onchange="updateSpotlight()" class="border border-slate-300 rounded-lg px-3 py-2 bg-slate-50 font-medium text-sm text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            <option value="Swetanshu">Swetanshu (402 Pending)</option>
+            <option value="Chris">Chris (272 Pending)</option>
+            <option value="Anupriya">Anupriya (217 Pending)</option>
+            <option value="Kavita">Kavita (187 Pending)</option>
+            <option value="Chandra">Chandra (147 Pending)</option>
+            <option value="Aparna">Aparna (139 Pending)</option>
+            <option value="Avani">Avani (107 Pending)</option>
+            <option value="Vivian">Vivian (99 Pending)</option>
+            <option value="Priya">Priya (43 Pending)</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="spotlightContent" class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- Visual Charts -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <h3 class="text-base font-bold text-slate-900 mb-1">Total Pending Workload by Member</h3>
+        <p class="text-xs text-slate-500 mb-4">Total pending quota plans assigned to each team member</p>
+        <div class="h-64">
+          <canvas id="workloadChart"></canvas>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <h3 class="text-base font-bold text-slate-900 mb-1">Plan Aging Breakdown by Tier</h3>
+        <p class="text-xs text-slate-500 mb-4">Distribution of plan aging across all 4 age categories</p>
+        <div class="h-64 flex items-center justify-center">
+          <canvas id="agingChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Data Matrix Table -->
+    <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900">Quota Audit Matrix</h3>
+          <p class="text-xs text-slate-500">Complete breakdown of quota audit categories across all team members</p>
+        </div>
+        <div class="relative w-full md:w-64">
+          <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search audit category..." class="w-full border border-slate-300 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-600" id="matrixTable">
+          <thead class="bg-slate-100 text-slate-700 uppercase font-semibold border-b border-slate-200">
+            <tr>
+              <th class="py-3 px-4 min-w-[280px]">Audit Name</th>
+              <th class="py-3 px-2 text-center">Aparna</th>
+              <th class="py-3 px-2 text-center">Avani</th>
+              <th class="py-3 px-2 text-center">Anupriya</th>
+              <th class="py-3 px-2 text-center">Chris</th>
+              <th class="py-3 px-2 text-center">Chandra</th>
+              <th class="py-3 px-2 text-center">Kavita</th>
+              <th class="py-3 px-2 text-center">Priya</th>
+              <th class="py-3 px-2 text-center">Swetanshu</th>
+              <th class="py-3 px-2 text-center">Vivian</th>
+              <th class="py-3 px-3 text-center bg-indigo-50 text-indigo-900 font-bold">Total</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200 font-medium">
+            <tr class="bg-indigo-50/40 hover:bg-indigo-50 font-bold text-indigo-950">
+              <td class="py-3 px-4 text-indigo-900">Pending Quota Plans</td>
+              <td class="py-3 px-2 text-center text-red-600 bg-red-50">139</td>
+              <td class="py-3 px-2 text-center text-red-600 bg-red-50">107</td>
+              <td class="py-3 px-2 text-center text-red-600 bg-red-50">217</td>
+              <td class="py-3 px-2 text-center text-red-600 bg-red-50">272</td>
+              <td class="py-3 px-2 text-center text-red-600 bg-red-50">147</td>
+              <td class="py-3 px-2 text-center text-red-600 bg-red-50">187</td>
+              <td class="py-3 px-2 text-center text-red-600 bg-red-50">43</td>
+              <td class="py-3 px-2 text-center text-red-600 bg-red-50 font-black">402</td>
+              <td class="py-3 px-2 text-center text-red-600 bg-red-50">99</td>
+              <td class="py-3 px-3 text-center bg-indigo-100 text-indigo-900 text-sm">1,613</td>
+            </tr>
+            <tr class="hover:bg-slate-50">
+              <td class="py-2.5 px-4">Pending quota plans with plan age (31-60 Days)</td>
+              <td class="py-2.5 px-2 text-center">33</td>
+              <td class="py-2.5 px-2 text-center">18</td>
+              <td class="py-2.5 px-2 text-center">50</td>
+              <td class="py-2.5 px-2 text-center">26</td>
+              <td class="py-2.5 px-2 text-center">22</td>
+              <td class="py-2.5 px-2 text-center">67</td>
+              <td class="py-2.5 px-2 text-center">8</td>
+              <td class="py-2.5 px-2 text-center">68</td>
+              <td class="py-2.5 px-2 text-center">11</td>
+              <td class="py-2.5 px-3 text-center bg-slate-50 font-bold">303</td>
+            </tr>
+            <tr class="hover:bg-slate-50">
+              <td class="py-2.5 px-4">Pending quota plans with plan age (60-89 Days)</td>
+              <td class="py-2.5 px-2 text-center">37</td>
+              <td class="py-2.5 px-2 text-center">22</td>
+              <td class="py-2.5 px-2 text-center">58</td>
+              <td class="py-2.5 px-2 text-center">27</td>
+              <td class="py-2.5 px-2 text-center text-slate-300">-</td>
+              <td class="py-2.5 px-2 text-center">35</td>
+              <td class="py-2.5 px-2 text-center">1</td>
+              <td class="py-2.5 px-2 text-center">60</td>
+              <td class="py-2.5 px-2 text-center">23</td>
+              <td class="py-2.5 px-3 text-center bg-slate-50 font-bold">263</td>
+            </tr>
+            <tr class="hover:bg-slate-50">
+              <td class="py-2.5 px-4">Pending quota plans with plan age (90-120 Days)</td>
+              <td class="py-2.5 px-2 text-center">9</td>
+              <td class="py-2.5 px-2 text-center">6</td>
+              <td class="py-2.5 px-2 text-center">2</td>
+              <td class="py-2.5 px-2 text-center">11</td>
+              <td class="py-2.5 px-2 text-center">17</td>
+              <td class="py-2.5 px-2 text-center">12</td>
+              <td class="py-2.5 px-2 text-center text-slate-300">-</td>
+              <td class="py-2.5 px-2 text-center text-slate-300">-</td>
+              <td class="py-2.5 px-2 text-center">4</td>
+              <td class="py-2.5 px-3 text-center bg-slate-50 font-bold">61</td>
+            </tr>
+            <tr class="hover:bg-slate-50 bg-red-50/20">
+              <td class="py-2.5 px-4 font-semibold text-red-900">Pending quota plans with plan age (&gt; 120 Days)</td>
+              <td class="py-2.5 px-2 text-center font-medium">21</td>
+              <td class="py-2.5 px-2 text-center font-medium">20</td>
+              <td class="py-2.5 px-2 text-center font-medium">34</td>
+              <td class="py-2.5 px-2 text-center font-medium">29</td>
+              <td class="py-2.5 px-2 text-center font-medium">31</td>
+              <td class="py-2.5 px-2 text-center font-medium">13</td>
+              <td class="py-2.5 px-2 text-center font-medium">2</td>
+              <td class="py-2.5 px-2 text-center text-slate-300">-</td>
+              <td class="py-2.5 px-2 text-center font-medium">15</td>
+              <td class="py-2.5 px-3 text-center bg-red-100 text-red-900 font-bold">165</td>
+            </tr>
+            <tr class="hover:bg-slate-50">
+              <td class="py-2.5 px-4">Pending quota plans with quota status of Completed or Resubmitted</td>
+              <td class="py-2.5 px-2 text-center">3</td>
+              <td class="py-2.5 px-2 text-center">5</td>
+              <td class="py-2.5 px-2 text-center">2</td>
+              <td class="py-2.5 px-2 text-center text-slate-300">-</td>
+              <td class="py-2.5 px-2 text-center">2</td>
+              <td class="py-2.5 px-2 text-center">1</td>
+              <td class="py-2.5 px-2 text-center">2</td>
+              <td class="py-2.5 px-2 text-center">4</td>
+              <td class="py-2.5 px-2 text-center">4</td>
+              <td class="py-2.5 px-3 text-center bg-slate-50 font-bold">23</td>
+            </tr>
+            <tr class="hover:bg-slate-50">
+              <td class="py-2.5 px-4">"No Change" Quota Status Audit</td>
+              <td class="py-2.5 px-2 text-center">21</td>
+              <td class="py-2.5 px-2 text-center">15</td>
+              <td class="py-2.5 px-2 text-center">35</td>
+              <td class="py-2.5 px-2 text-center">56</td>
+              <td class="py-2.5 px-2 text-center">34</td>
+              <td class="py-2.5 px-2 text-center">9</td>
+              <td class="py-2.5 px-2 text-center">2</td>
+              <td class="py-2.5 px-2 text-center">22</td>
+              <td class="py-2.5 px-2 text-center">14</td>
+              <td class="py-2.5 px-3 text-center bg-slate-50 font-bold">208</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const teamData = {
+      'Swetanshu': { pending: 402, age31_60: 68, age60_89: 60, age90_120: 0, age120Plus: 0 },
+      'Chris': { pending: 272, age31_60: 26, age60_89: 27, age90_120: 11, age120Plus: 29 },
+      'Anupriya': { pending: 217, age31_60: 50, age60_89: 58, age90_120: 2, age120Plus: 34 },
+      'Kavita': { pending: 187, age31_60: 67, age60_89: 35, age90_120: 12, age120Plus: 13 },
+      'Chandra': { pending: 147, age31_60: 22, age60_89: 0, age90_120: 17, age120Plus: 31 },
+      'Aparna': { pending: 139, age31_60: 33, age60_89: 37, age90_120: 9, age120Plus: 21 },
+      'Avani': { pending: 107, age31_60: 18, age60_89: 22, age90_120: 6, age120Plus: 20 },
+      'Vivian': { pending: 99, age31_60: 11, age60_89: 23, age90_120: 4, age120Plus: 15 },
+      'Priya': { pending: 43, age31_60: 8, age60_89: 1, age90_120: 0, age120Plus: 2 }
+    };
+
+    function updateSpotlight() {
+      const select = document.getElementById('memberSelect');
+      const name = select.value;
+      const data = teamData[name];
+      const container = document.getElementById('spotlightContent');
+
+      container.innerHTML = `
+        <div class="bg-indigo-50/50 border border-indigo-100 rounded-lg p-4">
+          <div class="text-xs font-semibold text-indigo-600 uppercase">Total Pending</div>
+          <div class="text-2xl font-black text-indigo-950 mt-1">${data.pending}</div>
+          <div class="text-[11px] text-slate-500 mt-1">Pending quota plans</div>
+        </div>
+        <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
+          <div class="text-xs font-semibold text-slate-500 uppercase">31 – 89 Days Age</div>
+          <div class="text-2xl font-bold text-slate-800 mt-1">${data.age31_60 + data.age60_89}</div>
+          <div class="text-[11px] text-slate-500 mt-1">${data.age31_60} (31-60d) | ${data.age60_89} (60-89d)</div>
+        </div>
+        <div class="bg-amber-50/50 border border-amber-100 rounded-lg p-4">
+          <div class="text-xs font-semibold text-amber-700 uppercase">90 – 120 Days Age</div>
+          <div class="text-2xl font-bold text-amber-900 mt-1">${data.age90_120}</div>
+          <div class="text-[11px] text-slate-500 mt-1">Requires review soon</div>
+        </div>
+        <div class="bg-red-50/50 border border-red-100 rounded-lg p-4">
+          <div class="text-xs font-semibold text-red-700 uppercase">&gt; 120 Days Critical</div>
+          <div class="text-2xl font-bold text-red-900 mt-1">${data.age120Plus}</div>
+          <div class="text-[11px] text-slate-500 mt-1">Highest priority resolution</div>
+        </div>
+      `;
+    }
+
+    function initCharts() {
+      // Workload Chart
+      const ctx1 = document.getElementById('workloadChart').getContext('2d');
+      new Chart(ctx1, {
+        type: 'bar',
+        data: {
+          labels: ['Swetanshu', 'Chris', 'Anupriya', 'Kavita', 'Chandra', 'Aparna', 'Avani', 'Vivian', 'Priya'],
+          datasets: [{
+            label: 'Pending Quota Plans',
+            data: [402, 272, 217, 187, 147, 139, 107, 99, 43],
+            backgroundColor: '#6366f1',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+
+      // Aging Chart
+      const ctx2 = document.getElementById('agingChart').getContext('2d');
+      new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+          labels: ['31–60 Days', '60–89 Days', '90–120 Days', '>120 Days'],
+          datasets: [{
+            data: [303, 263, 61, 165],
+            backgroundColor: ['#818cf8', '#f59e0b', '#f97316', '#ef4444']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom' } }
+        }
+      });
+    }
+
+    function filterTable() {
+      const input = document.getElementById('searchInput');
+      const filter = input.value.toLowerCase();
+      const tbody = document.querySelector('#matrixTable tbody');
+      const rows = tbody.getElementsByTagName('tr');
+
+      for (let i = 0; i < rows.length; i++) {
+        const text = rows[i].getElementsByTagName('td')[0].textContent || rows[i].getElementsByTagName('td')[0].innerText;
+        rows[i].style.display = text.toLowerCase().indexOf(filter) > -1 ? "" : "none";
+      }
+    }
+
+    function copySlackUpdate() {
+      const text = `📊 *Quota Audit Status Update*\n\n` +
+        `• *Total Pending Quota Plans:* 1,613\n` +
+        `• *Plan Aging Breakdown:*\n` +
+        `  - 31–60 Days: 303\n` +
+        `  - 60–89 Days: 263\n` +
+        `  - 90–120 Days: 61\n` +
+        `  - >120 Days (Critical): 165\n\n` +
+        `👤 *Top Pending Loads:* Swetanshu (402), Chris (272), Anupriya (217)\n` +
+        `🔗 *Check your individual items in the interactive dashboard!*`;
+
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Share summary copied to clipboard!');
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateSpotlight();
+      initCharts();
+    });
+  </script>
+</body>
+</html>
